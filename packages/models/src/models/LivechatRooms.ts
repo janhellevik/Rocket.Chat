@@ -80,6 +80,45 @@ export class LivechatRoomsRaw extends BaseRaw<IOmnichannelRoom> implements ILive
 			{ key: { servedBy: 1, ts: 1 }, partialFilterExpression: { servedBy: { $exists: true }, t: 'l' } },
 			{ key: { 'v.activity': 1, 'ts': 1 }, partialFilterExpression: { 'v.activity': { $exists: true }, 't': 'l' } },
 			{ key: { contactId: 1 }, partialFilterExpression: { contactId: { $exists: true }, t: 'l' } },
+			{
+				// on hold
+				key: { t: 1, open: 1, onHold: 1, servedBy: 1 },
+				partialFilterExpression: {
+					t: { $eq: 'l' },
+					open: { $exists: true },
+					onHold: { $eq: true },
+					servedBy: { $exists: true },
+				},
+			},
+			{
+				// closed
+				key: { t: 1, open: 1, onHold: 1 },
+				partialFilterExpression: {
+					t: { $eq: 'l' },
+					open: { $eq: null }, // Check for missing or null value
+					onHold: { $ne: true },
+				},
+			},
+			{
+				// queued
+				key: { t: 1, open: 1, onHold: 1, servedBy: 1 },
+				partialFilterExpression: {
+					t: { $eq: 'l' },
+					open: { $eq: true },
+					onHold: { $ne: true },
+					servedBy: { $exists: false },
+				},
+			},
+			{
+				// open
+				key: { t: 1, open: 1, onHold: 1, servedBy: 1 },
+				partialFilterExpression: {
+					t: { $eq: 'l' },
+					open: { $exists: true },
+					onHold: { $ne: true },
+					servedBy: { $exists: true },
+				},
+			},
 		];
 	}
 
@@ -1334,6 +1373,8 @@ export class LivechatRoomsRaw extends BaseRaw<IOmnichannelRoom> implements ILive
 			query.open = true;
 			query.onHold = { $ne: true };
 		}
+
+		console.log({ query });
 
 		return this.findPaginated(query, {
 			sort: options.sort || { name: 1 },
