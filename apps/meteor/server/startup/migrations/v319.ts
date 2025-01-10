@@ -11,7 +11,7 @@ const maxAgeSettingMap = new Map([
 ]);
 
 addMigration({
-	version: 318,
+	version: 319,
 	name: 'Move retention policy settings',
 	async up() {
 		const convertDaysToMs = (days: number) => days * 24 * 60 * 60 * 1000;
