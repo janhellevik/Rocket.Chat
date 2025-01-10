@@ -10,7 +10,20 @@ import RoleForm from './RoleForm';
 import { ContextualbarFooter, ContextualbarScrollableContent } from '../../../components/Contextualbar';
 import GenericModal from '../../../components/GenericModal';
 
-const EditRolePage = ({ role, isEnterprise }: { role?: IRole; isEnterprise: boolean }): ReactElement => {
+type EditRolePageFormData = {
+	roleId: string;
+	name: string;
+	description: string;
+	scope: 'Users' | 'Subscriptions';
+	mandatory2fa: boolean;
+};
+
+type EditRolePageProps = {
+	role?: IRole;
+	isEnterprise: boolean;
+};
+
+const EditRolePage = ({ role, isEnterprise }: EditRolePageProps): ReactElement => {
 	const { t } = useTranslation();
 	const dispatchToastMessage = useToastMessageDispatch();
 	const setModal = useSetModal();
@@ -21,7 +34,7 @@ const EditRolePage = ({ role, isEnterprise }: { role?: IRole; isEnterprise: bool
 	const updateRole = useEndpoint('POST', '/v1/roles.update');
 	const deleteRole = useEndpoint('POST', '/v1/roles.delete');
 
-	const methods = useForm({
+	const methods = useForm<EditRolePageFormData>({
 		defaultValues: {
 			roleId: role?._id,
 			name: role?.name,
@@ -40,7 +53,7 @@ const EditRolePage = ({ role, isEnterprise }: { role?: IRole; isEnterprise: bool
 		}
 	});
 
-	const handleSave = useEffectEvent(async (data) => {
+	const handleSave = useEffectEvent(async (data: EditRolePageFormData) => {
 		try {
 			if (data.roleId) {
 				await updateRole(data);
